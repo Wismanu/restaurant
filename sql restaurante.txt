@@ -1,0 +1,153 @@
+CREATE TABLE restaurante.cargo
+(	
+	cargo VARCHAR(15),
+	descripcion varchar (40)
+	CONSTRAINT pk_cargo PRIMARY KEY (cargo)
+)
+-----------------------------------------------------------------------
+CREATE TABLE restaurante.acceso
+(	
+	codigo_acceso VARCHAR(10),
+	permisos varchar (15),
+	descripcion varchar(50),
+	CONSTRAINT pk_acceso PRIMARY KEY (codigo_acceso)
+)
+----------------------------------------------------------------------
+
+CREATE TABLE restaurante.mesa
+(	
+	num_mesa SERIAL,
+	Descripcion VARCHAR(40),
+	CONSTRAINT pk_mesa PRIMARY KEY (num_mesa)
+)
+
+-----------------------------------------------------------------------
+CREATE TABLE restaurante.proveedor
+(	
+	nit VARCHAR(10),
+	direccion varchar (50),
+	nombre varchar(50),
+	CONSTRAINT pk_proveedor PRIMARY KEY (nit)
+)
+
+-----------------------------------------------------------------------
+CREATE TABLE restaurante.producto
+(	
+	cod_producto VARCHAR(4),
+	nit varchar (10),
+	nombre varchar(20),
+	precio_unitario DECIMAL,
+	CONSTRAINT pk_producto PRIMARY KEY (cod_producto),
+	CONSTRAINT fk_proveedor_producto FOREIGN KEY (nit)
+	REFERENCES restaurante.proveedor (nit)
+	ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+-----------------------------------------------------------------------
+CREATE TABLE restaurante.detalle
+(	
+	consecutivo SERIAL,
+	ordinal VARCHAR(2),
+	cod_producto SERIAL,
+	cantidad INTEGER,
+	CONSTRAINT pk_detalle PRIMARY KEY (consecutivo,ordinal),
+	CONSTRAINT fk_producto_detalle FOREIGN KEY (cod_producto)
+	REFERENCES restaurante.producto (cod_producto)
+	ON DELETE CASCADE ON UPDATE CASCADE
+)
+-----------------------------------------------------------------------
+CREATE TABLE restaurante.comuna
+(	
+	cod_comuna VARCHAR(2),
+	nombre VARCHAR (40) NOT NULL,
+	kms_2 DECIMAL,
+	CONSTRAINT pk_comuna PRIMARY KEY (cod_comuna)
+)
+
+-----------------------------------------------------------------------
+CREATE TABLE restaurante.barrio
+(	
+	cod_comuna VARCHAR(2),
+	cod_barrio varchar (2),
+	nombre varchar(40) NOT NULL,
+	CONSTRAINT pk_barrio PRIMARY KEY (cod_barrio,cod_comuna),
+	CONSTRAINT fk_comuna_barrio FOREIGN KEY (cod_comuna)
+	REFERENCES restaurante.comuna (cod_comuna)
+)
+
+--------------------------------------------------------------------------
+CREATE TABLE restaurante.cliente
+(
+	id_cliente SERIAL,
+	nombre VARCHAR(30)NOT NULL,
+	apellido VARCHAR (30) NOT NULL,
+	telefono VARCHAR (20),
+	direccion varchar (50),
+	cod_comuna varchar (2),
+	cod_barrio varchar (2),
+
+	
+	CONSTRAINT pk_cliente PRIMARY KEY (id_cliente),
+	CONSTRAINT fk_barrio_cliente FOREIGN KEY (cod_comuna,cod_barrio)
+	REFERENCES restaurante.barrio (cod_comuna,cod_barrio)
+	ON UPDATE CASCADE ON DELETE CASCADE
+)
+--------------------------------------------------------------------------
+CREATE TABLE restaurante.empleado
+(
+	id_empleado SERIAL,
+	cargo VARCHAR(15),
+	codigo_acceso VARCHAR (5) NOT NULL,
+	dni VARCHAR (12) NOT NULL,
+	nombre1 varchar (20),
+	nombre2 varchar (20),
+	apellido1 varchar (20),
+	apellido2 varchar (20),
+	direccion varchar (25),
+	
+	CONSTRAINT pk_empleado PRIMARY KEY (id_empleado),
+	CONSTRAINT fk_cargo_empleado FOREIGN KEY (cargo)
+	REFERENCES restaurante.cargo (cargo)
+	ON UPDATE CASCADE ON DELETE CASCADE
+)
+------------------------------------------------------------------------------------------------------
+CREATE TABLE restaurante.pedido
+(
+	id_empleado SERIAL,
+	id_pedido SERIAL,
+	num_mesa VARCHAR (3),
+	
+	CONSTRAINT pk_pedido PRIMARY KEY (id_pedido),
+	CONSTRAINT fk_empleado_pedido FOREIGN KEY (id_empleado)
+	REFERENCES restaurante.empleado (id_empleado)
+	ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT fk_num_mesa_pedido FOREIGN KEY (num_mesa)
+	REFERENCES restaurante.mesa (num_mesa)
+	ON UPDATE CASCADE ON DELETE CASCADE
+)
+---------------------------------------------------------------------------------------------
+CREATE TABLE restaurante.factura
+(
+	CONSECUTIVO SERIAL,
+	id_client SERIAL,
+	num_mesa SERIAL,
+	
+	CONSTRAINT pk_pedido PRIMARY KEY (id_pedido),
+	CONSTRAINT fk_empleado_pedido FOREIGN KEY (id_empleado)
+	REFERENCES restaurante.empleado (id_empleado)
+	ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT fk_num_mesa_pedido FOREIGN KEY (num_mesa)
+	REFERENCES restaurante.mesa (num_mesa)
+	ON UPDATE CASCADE ON DELETE CASCADE
+)
+
+ALTER TABLE restaurante.empleado
+ALTER COLUMN id_empleado TYPE SERIAL;
+
+----------------------------------------------------------
+/* Codigo para reciclar xd: 
+
+ALTER TABLE restaurante._________
+ALTER COLUMN ______ SET DATA TYPE _______;
+
+DROP TABLE restaurante.________;
